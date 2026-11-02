@@ -1,0 +1,18 @@
+{
+  "name": "example",
+  "machines": {"this": "MacBook Pro", "second": null},
+  "protected": ["~/Developer"],
+  "drive": null,
+  "localAI": "ollama",
+  "picks": {
+    "sentinel": {"on": true, "schedule": "hourly", "mode": "report", "params": {"warnGB": 40, "critGB": 20, "swapGB": 10, "procGB": 10}},
+    "leaks": {"on": true, "schedule": "6h", "mode": "report", "params": {"growGB": 2}},
+    "growth": {"on": true, "schedule": "daily", "mode": "report", "params": {"minGB": 2, "keepDays": 60}},
+    "downloads": {"on": true, "schedule": "daily", "mode": "ask", "params": {"ageDays": 30, "installerDays": 7}},
+    "caches": {"on": true, "schedule": "weekly", "mode": "ask", "params": {"derivedDays": 14, "minGB": 3}},
+    "posture": {"on": true, "schedule": "weekly", "mode": "report", "params": {"xprotectDays": 21}},
+    "persist": {"on": true, "schedule": "6h", "mode": "report", "params": {}},
+    "uninstall": {"on": true, "schedule": "on demand", "mode": "ask", "params": {}},
+    "dupes": {"on": false, "schedule": "monthly", "mode": "report", "params": {"minMB": 5}}
+  }
+}

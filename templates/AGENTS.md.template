@@ -1,0 +1,19 @@
+# AGENTS.md — {{Name}}
+
+{{Owner}}'s own upkeep for {{Macs: model, RAM, disk, macOS; second Mac via `ssh {{alias}}` if any}}. Built {{date}} from the Kempt. Picks are in config/picks.json.
+
+## Hard rules
+{{Paste every rule from the kit's reference/safety-rules.md here, verbatim, with <name> replaced by {{name}}.}}
+
+This project's specifics:
+- **Protected folders, never touched by any job:** {{e.g. ~/Developer, client folders, archive folders}}.
+- **Archive drive:** {{volume name, or none}}.
+- **Second Mac:** {{`ssh alias`, or none}}; read-only checks only.
+- Label every step [I RUN] or [YOU RUN].
+
+## Layout
+`bin/{{name}}` entry point; `lib/{{name}}/` core and trash; `jobs/` one file per job; `config/picks.json`; `launchd/` plists + install.sh; `state/` gitignored; `tests/` fixture-based; `app/` optional menu-bar app. Logs: `~/Library/Logs/{{name}}/`, one `latest/<job>.json` per job.
+
+## Commands
+- Tests: `python3 -m unittest discover -s tests -p 'test_*.py'`
+- Report: `bin/{{name}} report`; proposals: `bin/{{name}} apply` (lists) / `show <id>` / `apply <id>`; undo: `bin/{{name}} restore`

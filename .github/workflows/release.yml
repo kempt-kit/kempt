@@ -1,0 +1,23 @@
+name: release
+# Publishes a GitHub Release for every pushed tag like v1.3.1, using that
+# version's CHANGELOG.md entry as the notes. Releases appear as published by
+# github-actions, not by a person.
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Notes from CHANGELOG.md
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '$0 ~ "^## "v" " {f=1; next} /^## / {f=0} f' CHANGELOG.md > notes.md
+          test -s notes.md || echo "See CHANGELOG.md." > notes.md
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "Kempt ${GITHUB_REF_NAME#v}" --notes-file notes.md --verify-tag

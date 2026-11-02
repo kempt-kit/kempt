@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kempt setup</title>
+<meta name="description" content="Answer a few questions and get one prompt that has your AI coding tool build your own care app for your Mac.">
+<style>
+:root{
+  --bg:#f6f4ef;--card:#fffdf8;--ink:#1d1b17;--muted:#6b665c;--line:#e3ddd0;
+  --accent:#2f6b4f;--accent-ink:#ffffff;--warn-bg:#fff4dc;--warn-line:#e7c77a;--warn-ink:#6a4a00;
+  --code-bg:#1f2420;--code-ink:#e9f1ea;--focus:#2f6b4f55;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141613;--card:#1c1f1b;--ink:#ecebe6;--muted:#a19d93;--line:#2f332d;
+    --accent:#7cc39e;--accent-ink:#0f1a14;--warn-bg:#2b2416;--warn-line:#6b5524;--warn-ink:#f0d79a;
+    --code-bg:#0d0f0d;--code-ink:#dfe9e1;--focus:#7cc39e55;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:40px 16px 80px}
+h1{font:700 2.1rem/1.15 ui-serif,"New York",Georgia,serif;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:1.05rem;margin:0 0 4px}
+p{margin:.4em 0}
+.lede{color:var(--muted);font-size:1.05rem;margin-bottom:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0}
+.hint{color:var(--muted);font-size:.9rem}
+.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:var(--warn-ink);border-radius:12px;padding:14px 16px;font-size:.95rem}
+.warn strong{color:inherit}
+.warn ul{margin:.4em 0 0 1.1em;padding:0}
+fieldset{border:0;margin:0;padding:0}
+legend{font-weight:600;margin-bottom:8px;padding:0}
+.opts{display:grid;gap:8px}
+.opts.two{grid-template-columns:1fr 1fr}
+@media (max-width:560px){.opts.two{grid-template-columns:1fr}}
+label.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:transparent}
+label.opt:hover{border-color:var(--accent)}
+label.opt input{margin-top:4px;accent-color:var(--accent)}
+label.opt .t{font-weight:600}
+label.opt .d{display:block;color:var(--muted);font-size:.88rem;font-weight:400}
+label.opt .tag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:6px;margin-left:6px;vertical-align:1px;background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+input[type=text]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+input[type=text]:focus,label.opt:focus-within,button:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.row{display:grid;gap:14px}
+.group{margin-top:14px}
+.group h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 6px}
+.hidden{display:none!important}
+.out{border-color:var(--accent)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:16px;white-space:pre-wrap;word-break:break-word;font:13px/1.5 ui-monospace,"SF Mono",Menlo,monospace;margin:10px 0 0;max-height:46vh;overflow:auto}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{font:600 1rem/1 inherit;font-family:inherit;border:0;border-radius:10px;padding:12px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.ok{color:var(--accent);font-weight:600}
+.err{color:#b3261e;font-size:.9rem}
+footer{color:var(--muted);font-size:.85rem;margin-top:30px}
+footer a,.card a{color:var(--accent)}
+ol.steps{margin:.3em 0 0 1.2em;padding:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Build your own care app for your Mac</h1>
+  <p class="lede">Answer a few questions. You'll get one prompt to paste into your AI coding tool, which then builds a private app for your Mac, on your Mac. Nothing you choose here leaves this page.</p>
+
+  <div class="warn" role="note">
+    <strong>Read first.</strong>
+    <ul>
+      <li>Your own AI writes the app on your computer. Nobody else has tested the code it writes for you.</li>
+      <li>Report-only checks never change anything. Features marked <b>touches files</b> move or rename files; they use the Trash with an undo list and ask first by default, but bugs happen.</li>
+      <li>Have a current backup before turning on anything that touches files. Shared as is, with no warranty. <a href="https://github.com/kempt-kit/kempt/blob/main/NOTICE.md">Notice</a> · <a href="https://github.com/kempt-kit/kempt/blob/main/LICENSE">License</a></li>
+    </ul>
+  </div>
+
+  <form id="f" autocomplete="off" onsubmit="return false">
+  <div class="card">
+    <fieldset>
+      <legend>1. Which AI will build it?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="ai" value="agent" checked><span><span class="t">An AI coding tool that can run commands on my Mac</span><span class="d">Claude Code, OpenAI Codex CLI, Gemini CLI, Cursor's agent, GitHub Copilot agent mode, or similar. Builds the full app.</span></span></label>
+        <label class="opt"><input type="radio" name="ai" value="chat"><span><span class="t">A chat-only AI</span><span class="d">A chat window that can't touch your Mac. You'll get a read-only health check and a to-do list; nothing is installed.</span></span></label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div id="agentOnly">
+  <div class="card">
+    <fieldset>
+      <legend>2. How much setup?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="mode" value="quick" checked><span><span class="t">Quick setup (recommended)</span><span class="d">Safe, report-only checks for space, memory, leaks, security, drive health and updates, plus the menu-bar app. Nothing that moves files.</span></span></label>
+        <label class="opt"><input type="radio" name="mode" value="custom"><span><span class="t">Let me choose</span><span class="d">Pick from all 30 features, including ones that tidy files.</span></span></label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="card row">
+    <div>
+      <label for="name"><b>3. Name your app</b></label>
+      <p class="hint">Kempt is the default. Use letters, numbers and dashes; the command is the lowercase name.</p>
+      <input type="text" id="name" value="Kempt" maxlength="24" spellcheck="false">
+      <p id="nameErr" class="err hidden">Use 1–24 letters, numbers or dashes, starting with a letter.</p>
+    </div>
+    <fieldset>
+      <legend>Extras</legend>
+      <div class="opts two">
+        <label class="opt"><input type="checkbox" id="menubar" checked><span><span class="t">Menu-bar app</span><span class="d">A status icon and dashboard. Needs Xcode or its Command Line Tools.</span></span></label>
+        <label class="opt"><input type="checkbox" id="updates" checked><span><span class="t">Weekly update check</span><span class="d">Tells you when a new Kempt recipe is out. Sends nothing about you.</span></span></label>
+      </div>
+    </fieldset>
+  </div>
+
+  <div id="customOnly" class="hidden">
+    <div class="card row">
+      <fieldset>
+        <legend>4. What bothers you about your Mac?</legend>
+        <div class="opts two" id="bothers"></div>
+      </fieldset>
+      <fieldset>
+        <legend>How hands-off should it be?</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="hands" value="report"><span><span class="t">Report only</span><span class="d">It tells you things. It never changes anything.</span></span></label>
+          <label class="opt"><input type="radio" name="hands" value="ask" checked><span><span class="t">Ask before acting (recommended)</span><span class="d">It proposes; nothing moves until you approve.</span></span></label>
+          <label class="opt"><input type="radio" name="hands" value="auto"><span><span class="t">Act on its own for safe, reversible things</span><span class="d">Still uses the Trash with an undo list.</span></span></label>
+        </div>
+      </fieldset>
+      <div class="opts two">
+        <label class="opt"><input type="checkbox" id="code"><span><span class="t">I write code</span><span class="d">Adds developer caches and simulators; protects code folders.</span></span></label>
+        <label class="opt"><input type="checkbox" id="backup"><span><span class="t">I have a current backup</span><span class="d">Time Machine or similar. Your AI will check too.</span></span></label>
+      </div>
+      <div>
+        <label for="protect"><b>Folders it must never touch</b> <span class="hint">(optional, comma-separated)</span></label>
+        <input type="text" id="protect" placeholder="e.g. ~/Clients, ~/Archive">
+      </div>
+      <div class="opts two">
+        <div><label for="drive"><b>Archive drive name</b> <span class="hint">(optional)</span></label><input type="text" id="drive" placeholder="e.g. Backup Drive"></div>
+        <div><label for="ssh"><b>Second Mac's SSH name</b> <span class="hint">(optional)</span></label><input type="text" id="ssh" placeholder="e.g. studio-mac"></div>
+      </div>
+      <fieldset>
+        <legend>Local AI (stays on your Mac)</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="ai2" value="if-installed" checked><span><span class="t">Use it if it's already installed</span></span></label>
+          <label class="opt"><input type="radio" name="ai2" value="install"><span><span class="t">Install Ollama for it</span><span class="d">Needed for file renaming, search by meaning and screenshot reading.</span></span></label>
+          <label class="opt"><input type="radio" name="ai2" value="none"><span><span class="t">No AI features</span></span></label>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="card">
+      <h2>5. Features</h2>
+      <p class="hint">Report-only ones are pre-ticked. Anything marked <span class="tag" style="display:inline-block;font-size:.72rem;font-weight:700;padding:1px 6px;border-radius:6px;background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)">touches files</span> gets its own warning from your AI before it's added.</p>
+      <div id="features"></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="card out" aria-live="polite">
+    <div class="bar">
+      <h2 style="margin:0">Your prompt</h2>
+      <span class="hint" id="howto">Open your AI coding tool in any folder and paste this.</span>
+    </div>
+    <pre id="prompt"></pre>
+    <div class="bar" style="margin-top:12px">
+      <button type="button" id="copy">Copy prompt</button>
+      <button type="button" class="ghost" id="startOver">Start over</button>
+      <span id="copied" class="ok hidden">Copied</span>
+    </div>
+  </div>
+  </form>
+
+  <div class="card">
+    <h2>What happens next</h2>
+    <ol class="steps">
+      <li>Your AI shows a short warning and checks for a backup.</li>
+      <li>It looks over your Mac without changing anything and tells you anything urgent.</li>
+      <li>It builds and tests your app in phases. You can stop between phases.</li>
+      <li>At the end it gives you one command to start the background checks.</li>
+    </ol>
+    <p class="hint">Plan on an evening. A full build uses a meaningful share of your AI plan's usage.</p>
+  </div>
+
+  <footer>
+    <p>Kempt is a free recipe, not software: <a href="https://github.com/kempt-kit/kempt">github.com/kempt-kit/kempt</a>. This page runs entirely in your browser. It has no analytics, cookies or trackers, and sends nothing anywhere.</p>
+    <p>Not affiliated with Apple or any AI company. Apple, Mac and macOS are trademarks of Apple Inc.; other names belong to their owners.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var BUNDLE = "https://raw.githubusercontent.com/kempt-kit/kempt/main/KEMPT.md";
+  var BOTHERS = ["Running out of space","Slowness","Security worries","Messy Downloads or Desktop","Finding my files","Screenshots piling up"];
+  var QUICK = ["sentinel","leaks","growth","daemons","restart","health","posture","persist","optimize","updates","unused","orphans","report","kitcheck"];
+  var FEATURES = [
+    ["Storage",[["sentinel","Space sentinel","Usable space, swap, memory hogs; alerts"],["leaks","Known-leak watch","macOS space leaks, growth per day"],["growth","What-grew report","What got bigger since yesterday and last week"],["caches","Rebuildable-cache sweep","Package and build caches only",1],["photoq","Photos search-queue watch","Size of a known Photos queue; read only"]]],
+    ["Files",[["downloads","Downloads and Desktop triage","Old downloads into dated folders, old installers to the Trash",1],["tiers","Archive to an external drive","Copy cold files to a drive, verify, then Trash",1],["recognize","Rename and file documents","Local AI proposes names and folders for new PDFs",1],["ocr","Make scans searchable","Adds a text layer to image-only PDFs",1],["search","Search files by meaning","Local AI search across your folders"],["dupes","Duplicate report","Lists identical files; never deletes"],["screenshots","Screenshot knowledge","Reads screenshots into a searchable digest"]]],
+    ["Photos",[["pdupes","Photos duplicates count","Read only; you merge inside Photos"],["pshots","Old screenshots album","Adds old screenshots to a review album",1],["optimize","iCloud Optimize check","Is Optimize Mac Storage on?"]]],
+    ["Memory and system",[["daemons","Leaking process watch","Names any process using too much memory"],["restart","Restart and update nudge","Long uptime, staged updates"],["health","SSD and battery health","Wear and condition over time"]]],
+    ["Security",[["persist","New background item alert","Anything new that starts on its own"],["posture","Security settings check","FileVault, firewall and more, with links"],["firewall","Firewall help","Explains outbound firewalls; helps you choose one"],["browser","Browser extension watch","Flags new extensions"]]],
+    ["Apps",[["uninstall","Uninstall with leftovers","Removes an app and its files, with undo",1],["orphans","Leftovers of removed apps","Support folders whose app is gone"],["updates","One update list","All available updates in one place"],["unused","Unused apps","Not opened in months"]]],
+    ["Dashboard",[["report","Report command","One summary of every check"],["digest","Daily digest","One line when something needs a look"],["second","Second Mac","Read-only checks on another Mac over SSH"],["weekly-ai","Weekly AI check","A scheduled AI summary, read only"]]]
+  ];
+  var $ = function(id){return document.getElementById(id);};
+  var form = $("f");
+
+  BOTHERS.forEach(function(b,i){
+    var l=document.createElement("label"); l.className="opt";
+    l.innerHTML='<input type="checkbox" name="bother"><span><span class="t"></span></span>';
+    l.querySelector("input").value=b; l.querySelector(".t").textContent=b;
+    $("bothers").appendChild(l);
+  });
+  FEATURES.forEach(function(g){
+    var d=document.createElement("div"); d.className="group";
+    var h=document.createElement("h3"); h.textContent=g[0]; d.appendChild(h);
+    var o=document.createElement("div"); o.className="opts two";
+    g[1].forEach(function(f){
+      var l=document.createElement("label"); l.className="opt";
+      l.innerHTML='<input type="checkbox" name="feat"><span><span class="t"></span><span class="d"></span></span>';
+      var inp=l.querySelector("input"); inp.value=f[0]; inp.dataset.touch=f[3]?"1":"";
+      inp.checked=inp.defaultChecked=!f[3] && QUICK.indexOf(f[0])>=0;
+      l.querySelector(".t").textContent=f[1];
+      if(f[3]){var t=document.createElement("span"); t.className="tag"; t.textContent="touches files"; l.querySelector(".t").appendChild(t);}
+      l.querySelector(".d").textContent=f[2];
+      o.appendChild(l);
+    });
+    d.appendChild(o); $("features").appendChild(d);
+  });
+
+  function val(name){var e=form.querySelector('input[name="'+name+'"]:checked');return e?e.value:"";}
+  function clean(s){return String(s||"").replace(/[\r\n`]+/g," ").replace(/\s+/g," ").trim().slice(0,200);}
+  function validName(n){return /^[A-Za-z][A-Za-z0-9-]{0,23}$/.test(n);}
+
+  function build(){
+    var ai=val("ai"), chat=ai==="chat";
+    $("agentOnly").classList.toggle("hidden",chat);
+    $("howto").textContent = chat ? "Paste this into your chat AI (or upload KEMPT.md from the repo and paste the line)." : "Open your AI coding tool in any folder and paste this.";
+    if(chat){
+      $("prompt").textContent = "Read "+BUNDLE+", follow its chat-only section (FILE: CHAT-ONLY.md), and give me a read-only Mac health check. Give me one command at a time and wait for my output.";
+      return;
+    }
+    var mode=val("mode"); $("customOnly").classList.toggle("hidden",mode!=="custom");
+    var name=clean($("name").value)||"Kempt"; var ok=validName(name);
+    $("nameErr").classList.toggle("hidden",ok); if(!ok) name="Kempt";
+    var L=[];
+    L.push("Read "+BUNDLE+" and follow it to build me my own computer care tool.");
+    L.push("");
+    L.push("KEMPT SETUP ANSWERS (from the Kempt setup page; still show me the step-0 warning and the warning for each feature that touches files)");
+    L.push("- Setup: "+(mode==="quick"?"Quick setup (quick preset, report-only)":"Let me choose"));
+    L.push("- App name: "+name+" (command: "+name.toLowerCase()+")");
+    L.push("- Menu-bar app: "+($("menubar").checked?"yes":"no"));
+    L.push("- Weekly kit update check: "+($("updates").checked?"on":"off"));
+    if(mode==="custom"){
+      var b=[].slice.call(form.querySelectorAll('input[name="bother"]:checked')).map(function(e){return e.value;});
+      var hands={report:"report only",ask:"ask before acting",auto:"act on its own for safe, reversible things"}[val("hands")];
+      L.push("- What bothers me: "+(b.length?b.join(", "):"not specified"));
+      L.push("- Hands-off level: "+hands);
+      L.push("- I write code: "+($("code").checked?"yes":"no"));
+      L.push("- Protected folders: "+(clean($("protect").value)||"none beyond the defaults"));
+      L.push("- Archive drive: "+(clean($("drive").value)||"none"));
+      L.push("- Second Mac over SSH: "+(clean($("ssh").value)||"none"));
+      L.push("- Local AI: "+{"if-installed":"use it if already installed","install":"install Ollama for it","none":"no AI features"}[val("ai2")]);
+      var feats=[].slice.call(form.querySelectorAll('input[name="feat"]:checked'));
+      var rep=feats.filter(function(e){return !e.dataset.touch;}).map(function(e){return e.value;});
+      var touch=feats.filter(function(e){return e.dataset.touch;}).map(function(e){return e.value;});
+      if($("updates").checked && rep.indexOf("kitcheck")<0) rep.push("kitcheck");
+      L.push("- Report-only features: "+(rep.length?rep.join(", "):"none"));
+      L.push("- File-touching features I'm considering (warn me about each before adding it): "+(touch.length?touch.join(", "):"none"));
+      L.push("- Backup: "+($("backup").checked?"I believe I have a current backup (please check)":"not sure; please check"));
+    }
+    $("prompt").textContent=L.join("\n");
+  }
+
+  form.addEventListener("input",build); form.addEventListener("change",build);
+  $("copy").addEventListener("click",function(){
+    var t=$("prompt").textContent;
+    var done=function(){var c=$("copied");c.classList.remove("hidden");setTimeout(function(){c.classList.add("hidden");},1800);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,fallback);}else{fallback();}
+    function fallback(){var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");done();}catch(e){}document.body.removeChild(a);}
+  });
+  $("startOver").addEventListener("click",function(){HTMLFormElement.prototype.reset.call(form);build();window.scrollTo(0,0);});
+  build();
+})();
+</script>
+</body>
+</html>

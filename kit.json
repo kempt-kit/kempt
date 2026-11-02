@@ -1,0 +1,10 @@
+{
+  "name": "Kempt",
+  "version": "1.3.1",
+  "released": "2026-11-01",
+  "home": "https://github.com/kempt-kit/kempt",
+  "page": "https://kempt-kit.github.io/kempt/",
+  "latest": "https://raw.githubusercontent.com/kempt-kit/kempt/main/kit.json",
+  "bundle": "https://raw.githubusercontent.com/kempt-kit/kempt/main/KEMPT.md",
+  "note": "home = the kit's public page or repo; latest = a URL returning the newest kit.json as plain JSON; bundle = a URL returning KEMPT.md as plain text. Update checks stay off while latest is empty."
+}
