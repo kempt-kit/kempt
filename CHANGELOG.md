@@ -5,8 +5,11 @@ Newest first. Each release says what changed in the kit and, under **For tools b
 ## 1.5.0 — 2026-11-02
 - **New theme: Pro.** A dense, businesslike admin-console look: flat white or graphite cards, hairline borders, one blue accent, thin rings and sparklines, no motion. Follows light and dark mode. Suggested first for anyone who wants a work tool rather than a show piece. (Requested by a friend who built their own.)
 
+- **Background fixes from real use:** every theme paints an opaque backdrop (one that followed the system was see-through in settings and windows), no status-colour wash (it became a muddy band on dark themes), decorations kept clear of controls and skipped on small tiles, and an Appearance setting (System / Light / Dark) for themes that follow the system.
+
 **For tools built from an earlier version:**
-1. Optional: add the Pro theme from `reference/themes.md` (a new theme spec plus any new gauge/chart styles it needs). Touches: the app's theme catalog and views only; run the green/yellow/red check afterwards.
+1. Recommended for any menu-bar app: apply the four new "Rules every theme must follow" at the top of that section in `reference/themes.md` (opaque backdrops, no status wash, decorations clear of controls, Appearance setting). Touches: the backdrop view, the theme picker and settings.
+2. Optional: add the Pro theme from `reference/themes.md` (a new theme spec plus any new gauge/chart styles it needs). Touches: the app's theme catalog and views only; run the green/yellow/red check afterwards.
 
 ## 1.4.0 — 2026-11-02 — reliability audit
 A full audit of the original app this recipe comes from found the problems below; the recipe now tells your AI to build it right the first time.

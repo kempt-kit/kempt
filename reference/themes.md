@@ -20,6 +20,10 @@ Use only fonts that ship with macOS (pick one matching the style named below), o
 | **Pro** | A professional admin console: dense, calm, businesslike; follows light and dark mode | System font, small and compact, tabular numbers | Flat off-white page with white cards (dark: graphite page, charcoal cards), hairline borders, no shadows or glow, one saturated blue accent | Thin ring with the number in the middle | Thin line with a faint area fill and light gridlines | None: quick fades only |
 
 ## Rules every theme must follow
+- **Every theme paints its own opaque backdrop,** including one that follows the system. Relying on the menu's frosted material leaves settings windows, job windows and previews see-through.
+- **No status-colour wash over the background.** A tint of the overall status behind the header turns into a muddy band on dark themes; show status on the gauge, badges and menu-bar icon instead.
+- **Decorations stay out of the way:** nothing drawn behind the top centre (tab switcher) or the bottom toolbar, and small canvases (theme tiles, previews) skip decorations that only work at full size.
+- **Offer an Appearance setting** (System / Light / Dark) for themes that follow the system, so a light look doesn't need the whole Mac in light mode.
 - **Readable:** status text and numbers meet WCAG AA contrast in every theme; status is never shown by color alone (an icon or word too).
 - **The menu-bar icon never animates in any theme** (it caused a runaway loop; see menu-bar-app.md). Themes animate only inside the opened menu and windows.
 - **Light on battery:** animate only while the menu or a window is visible; near 0% CPU when closed. Cap frame rates (most themes 8–12 fps; Press, Atelier, Blueprint and Sorbet need no continuous animation).
