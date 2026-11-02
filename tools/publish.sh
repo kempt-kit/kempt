@@ -4,6 +4,7 @@
 # private key stays on the maintainer's Mac; the short-lived token is never
 # printed.
 #   bash tools/publish.sh                 push HEAD to main and tag v<kit.json version>
+#   bash tools/publish.sh --retag         re-push the tag so the release workflow runs
 #   bash tools/publish.sh --enable-pages  also turn on GitHub Pages from /docs (first publish)
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -30,8 +31,12 @@ ver=$(python3 -c 'import json; print(json.load(open("kit.json"))["version"])')
 git rev-parse -q --verify "refs/tags/v$ver" >/dev/null || { echo "tag v$ver missing: tag the release commit first"; exit 1; }
 
 auth=$(printf 'x-access-token:%s' "$tok" | openssl base64 -A)
-GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth" \
-  git push -q "https://github.com/$ORG/$REPO.git" "HEAD:refs/heads/main" "refs/tags/v$ver"
+gitp() { GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader" GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth" \
+  git push -q "https://github.com/$ORG/$REPO.git" "$@"; }
+# A tag that arrives with a repo's very first push doesn't start workflows;
+# --retag deletes and re-pushes it so the release workflow runs.
+[ "${1:-}" = "--retag" ] && { gitp ":refs/tags/v$ver" || true; }
+gitp "HEAD:refs/heads/main" "refs/tags/v$ver"
 echo "pushed main and v$ver as kempt-publisher"
 
 if [ "${1:-}" = "--enable-pages" ]; then
