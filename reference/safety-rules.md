@@ -17,3 +17,4 @@ Each rule exists because automated cleanup, scripts or careless automation can c
 10. **No secrets in output or git.** Commands that touch a credential print only a count. `.gitignore` covers `state/`, logs, `.env*`, keys and databases. Test fixtures use example.com addresses.
 11. **No "free memory" buttons.** macOS manages memory itself, and forcing it to purge rarely helps. Show memory pressure and name a leaking process instead.
 12. **Never change system security settings** (firewall, FileVault, SIP, Gatekeeper, sharing). Report them and deep-link the user to the right System Settings pane.
+13. **The menu-bar icon never animates.** No animation, `TimelineView`, symbol effect or timer-driven image in the menu-bar label; it can loop forever and consume all memory. Before calling the menu-bar app done, run it in a red state for 60 seconds and confirm CPU near 0% and flat memory.

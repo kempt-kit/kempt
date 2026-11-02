@@ -69,7 +69,7 @@ Each job: a `--dry-run` that writes nothing, a test against a fixture home folde
 - **Phase 1, read-only core:** every report-only pick, the report command, one LaunchAgent per cadence (hourly, every 6 h, daily, weekly, monthly, drive mount), not one per job.
 - **Phase 2, jobs that move things:** skip entirely if none were picked. Before starting, repeat the warning in two lines and re-check the backup date; continue only on a fresh "yes". Build the Trash + manifest + `restore` machinery first, with a real Trash-and-restore round trip on a scratch file; then the picked jobs. Before each job's first real (non-dry) run, show its dry-run list (every path it would touch) and get a yes; never let a file-touching job's first real run be a scheduled one the user hasn't seen. Ask-first jobs write proposals and act only via `<name> apply <id>`; a new proposal posts one macOS notification.
 - **Phase 3, local AI and search:** only the picked items, only local models.
-- **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen.
+- **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen. The menu-bar icon must stay still (rule 13); before calling this phase done, run the required green/yellow/red check in menu-bar-app.md and show the CPU and memory numbers.
 
 After each phase, review your own diff as a skeptic (use a separate reviewer agent if your tool supports one) for anything that could delete, overwrite, leak secrets or hang; fix what you find; re-run the tests.
 

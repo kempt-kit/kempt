@@ -1,4 +1,4 @@
-# KEMPT.md — Kempt 1.3.1, in one file
+# KEMPT.md — Kempt 1.3.2, in one file
 
 This file is the whole Kempt. Each original file follows below its own `===== FILE: <path> =====` line.
 
@@ -99,7 +99,7 @@ Each job: a `--dry-run` that writes nothing, a test against a fixture home folde
 - **Phase 1, read-only core:** every report-only pick, the report command, one LaunchAgent per cadence (hourly, every 6 h, daily, weekly, monthly, drive mount), not one per job.
 - **Phase 2, jobs that move things:** skip entirely if none were picked. Before starting, repeat the warning in two lines and re-check the backup date; continue only on a fresh "yes". Build the Trash + manifest + `restore` machinery first, with a real Trash-and-restore round trip on a scratch file; then the picked jobs. Before each job's first real (non-dry) run, show its dry-run list (every path it would touch) and get a yes; never let a file-touching job's first real run be a scheduled one the user hasn't seen. Ask-first jobs write proposals and act only via `<name> apply <id>`; a new proposal posts one macOS notification.
 - **Phase 3, local AI and search:** only the picked items, only local models.
-- **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen.
+- **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen. The menu-bar icon must stay still (rule 13); before calling this phase done, run the required green/yellow/red check in menu-bar-app.md and show the CPU and memory numbers.
 
 After each phase, review your own diff as a skeptic (use a separate reviewer agent if your tool supports one) for anything that could delete, overwrite, leak secrets or hang; fix what you find; re-run the tests.
 
@@ -163,6 +163,7 @@ Each rule exists because automated cleanup, scripts or careless automation can c
 10. **No secrets in output or git.** Commands that touch a credential print only a count. `.gitignore` covers `state/`, logs, `.env*`, keys and databases. Test fixtures use example.com addresses.
 11. **No "free memory" buttons.** macOS manages memory itself, and forcing it to purge rarely helps. Show memory pressure and name a leaking process instead.
 12. **Never change system security settings** (firewall, FileVault, SIP, Gatekeeper, sharing). Report them and deep-link the user to the right System Settings pane.
+13. **The menu-bar icon never animates.** No animation, `TimelineView`, symbol effect or timer-driven image in the menu-bar label; it can loop forever and consume all memory. Before calling the menu-bar app done, run it in a red state for 60 seconds and confirm CPU near 0% and flat memory.
 
 ===== FILE: reference/ideas.md =====
 
@@ -331,7 +332,7 @@ Run the read-only subset over `ssh <alias>` with a single heredoc script that pr
 A thin native front end over the tool. It never re-implements a check or touches files itself: it reads `~/Library/Logs/<name>/latest/*.json` and acts only by running `bin/<name>` commands.
 
 ## v1
-- Menu-bar icon tinted by the worst status, static (a pulse only when red).
+- Menu-bar icon: a **still** image tinted by the worst status. It never animates, not even when red (see the first pitfall).
 - Header: usable GB, swap, memory pressure, last check time; every number shows its age.
 - Yellow and red items grouped by job, each with its value and suggested action.
 - "Waiting on you": open proposals. Approve runs `<name> apply <id>` only after a second confirm click that shows exactly what will happen.
@@ -346,6 +347,7 @@ A thin native front end over the tool. It never re-implements a check or touches
 - Tests: JSON parsing and status roll-up from fixture files; theme tokens complete and readable.
 
 ## Pitfalls found the hard way
+- **Never animate the menu-bar icon.** No `TimelineView`, `.symbolEffect`, animation, or timer-swapped image anywhere inside the `MenuBarExtra` label. The menu-bar host rebuilds the label every time its image changes, so a pulse there restarts itself forever: the app pins a CPU core at 100%, its memory grows by gigabytes a minute (one real build reached 17 GB and pushed 20 GB into swap), and the menu never opens. It only shows up while something is red, so ordinary testing misses it. Animate only inside the opened menu window.
 - SwiftUI's built-in `Settings` scene silently fails in menu-bar-only apps; open a regular window instead.
 - A System Settings deep link that opens a sheet (e.g. some Sharing sub-panes) makes System Settings ignore later links until the sheet closes; link to the pane, not the sheet.
 - Screenshot tools often can't capture menu-bar-only windows; render views offscreen to PNG for checks.
@@ -353,7 +355,8 @@ A thin native front end over the tool. It never re-implements a check or touches
 - Changing the bundle id resets the login item and saved preferences.
 
 ## Guardrails
-- Near 0% CPU when closed: animate only while visible (pause `TimelineView`), no polling faster than the file watcher needs.
+- Near 0% CPU when closed: animate only inside the opened menu or windows (pause `TimelineView` when hidden), never in the menu-bar label, and no polling faster than the file watcher needs.
+- **Required check before the app counts as done:** launch the real installed app once in each status (green, yellow and red, using fixture results or a `--status` test switch), leave the menu closed for 60 seconds each time, and confirm CPU stays near 0% and memory stays flat (`ps -o %cpu=,rss= -p <pid>` every few seconds). Report the numbers. A red-only failure is the most likely kind.
 - Respect Reduce Motion and Reduce Transparency; status never told by color alone; AA contrast in every theme.
 - No network. No "free memory" button.
 
@@ -381,6 +384,7 @@ Use only fonts that ship with macOS (pick one matching the style named below), o
 
 ## Rules every theme must follow
 - **Readable:** status text and numbers meet WCAG AA contrast in every theme; status is never shown by color alone (an icon or word too).
+- **The menu-bar icon never animates in any theme** (it caused a runaway loop; see menu-bar-app.md). Themes animate only inside the opened menu and windows.
 - **Light on battery:** animate only while the menu or a window is visible; near 0% CPU when closed. Cap frame rates (most themes 8–12 fps; Press, Atelier, Blueprint and Sorbet need no continuous animation).
 - **Reduce Motion and Reduce Transparency** turn motion and glass off in every theme.
 - **Switching themes** is a saved preference only: no relaunch, no new process.
@@ -446,8 +450,8 @@ This project's specifics:
 
 {
   "name": "Kempt",
-  "version": "1.3.1",
-  "released": "2026-11-01",
+  "version": "1.3.2",
+  "released": "2026-11-02",
   "home": "https://github.com/kempt-kit/kempt",
   "page": "https://kempt-kit.github.io/kempt/",
   "latest": "https://raw.githubusercontent.com/kempt-kit/kempt/main/kit.json",
@@ -460,6 +464,13 @@ This project's specifics:
 # Changelog
 
 Newest first. Each release says what changed in the kit and, under **For tools built from an earlier version**, what an AI agent should offer to add or change in an existing tool. Every item there is opt-in and goes through the same warnings and gates as a new build.
+
+## 1.3.2 — 2026-11-02 — URGENT fix for menu-bar apps
+- **Bug fixed in the recipe:** 1.3.0 and 1.3.1 said the menu-bar icon could pulse while something is red. On macOS 27 an animated menu-bar icon can loop forever: the app spins at 100% CPU, its memory grows by gigabytes a minute (one build reached 17 GB and pushed 20 GB into swap), and the menu never opens. It only happens while a check is red, so it's easy to miss.
+- The recipe now forbids any animation in the menu-bar icon (new safety rule 13) and requires a green/yellow/red test with CPU and memory numbers before the menu-bar app counts as done.
+
+**For tools built from an earlier version (do this first, even if nothing else):**
+1. **Urgent if your tool has a menu-bar app:** remove any `TimelineView`, animation, `.symbolEffect` or timer-swapped image from the menu-bar label so the icon is a still image tinted by status. Add rule 13 from `reference/safety-rules.md` to the tool's AGENTS.md. Then run the app in a red state with the menu closed for 60 seconds and confirm CPU near 0% and flat memory. Touches: the app's menu-bar label view and AGENTS.md.
 
 ## 1.3.1 — 2026-11-01
 - **New home:** the recipe now lives at github.com/kempt-kit/kempt, and the setup page at kempt-kit.github.io/kempt.

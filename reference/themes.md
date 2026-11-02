@@ -20,6 +20,7 @@ Use only fonts that ship with macOS (pick one matching the style named below), o
 
 ## Rules every theme must follow
 - **Readable:** status text and numbers meet WCAG AA contrast in every theme; status is never shown by color alone (an icon or word too).
+- **The menu-bar icon never animates in any theme** (it caused a runaway loop; see menu-bar-app.md). Themes animate only inside the opened menu and windows.
 - **Light on battery:** animate only while the menu or a window is visible; near 0% CPU when closed. Cap frame rates (most themes 8–12 fps; Press, Atelier, Blueprint and Sorbet need no continuous animation).
 - **Reduce Motion and Reduce Transparency** turn motion and glass off in every theme.
 - **Switching themes** is a saved preference only: no relaunch, no new process.
