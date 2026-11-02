@@ -1,6 +1,6 @@
 # Theme menu (for the menu-bar app)
 
-Offer these during phase 4. The user can pick one, several, or all; build each as a **whole look**, not a color swap. Every theme sets: typeface style, palette, backdrop, card surface, the main gauge, the chart style, icon style, meters, and motion. Write each theme as data (a theme spec with every token), so adding one never touches the views.
+Offer these during phase 4. **Pro** is the default suggestion for anyone who wants a no-nonsense work tool rather than a show piece. The user can pick one, several, or all; build each as a **whole look**, not a color swap. Every theme sets: typeface style, palette, backdrop, card surface, the main gauge, the chart style, icon style, meters, and motion. Write each theme as data (a theme spec with every token), so adding one never touches the views.
 
 Use only fonts that ship with macOS (pick one matching the style named below), or the system font.
 
@@ -17,6 +17,7 @@ Use only fonts that ship with macOS (pick one matching the style named below), o
 | **Blueprint** | Drafting table | Condensed technical sans, uppercase, wide tracking | Cyanotype blue with a drafting grid; dashed outlines | Protractor | Isometric ribbon chart | Precise, ruled |
 | **Sorbet** | Loud and happy | Rounded bold | Pastel confetti; chunky outlined cards; sticker icons | Fat donut | Candy bars that bounce in | Springy |
 | **Abyss** | Deep ocean | Light humanist sans, uppercase, wide tracking | Dark teal depths with rising bioluminescent particles | Sonar sweep showing free space | Light particles flowing along the line | Slow drift |
+| **Pro** | A professional admin console: dense, calm, businesslike; follows light and dark mode | System font, small and compact, tabular numbers | Flat off-white page with white cards (dark: graphite page, charcoal cards), hairline borders, no shadows or glow, one saturated blue accent | Thin ring with the number in the middle | Thin line with a faint area fill and light gridlines | None: quick fades only |
 
 ## Rules every theme must follow
 - **Readable:** status text and numbers meet WCAG AA contrast in every theme; status is never shown by color alone (an icon or word too).

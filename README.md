@@ -72,7 +72,7 @@ New kit versions are listed in `CHANGELOG.md`, with what an existing tool can ad
 | `reference/known-leaks.md` | macOS space and memory leaks worth watching |
 | `reference/architecture.md` | Folder layout, job contract, proposals and undo |
 | `reference/menu-bar-app.md` | Design and guardrails for the optional SwiftUI app |
-| `reference/themes.md` | Eleven complete looks to pick from, and the command-center screen |
+| `reference/themes.md` | Twelve complete looks to pick from (including a dense, businesslike Pro), and the command-center screen |
 | `templates/` | Starting instructions file and settings file for your new project |
 | `NOTICE.md`, `LICENSE` | Disclaimer, trademarks, MIT License |
 

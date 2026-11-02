@@ -1,4 +1,4 @@
-# KEMPT.md — Kempt 1.4.0, in one file
+# KEMPT.md — Kempt 1.5.0, in one file
 
 This file is the whole Kempt. Each original file follows below its own `===== FILE: <path> =====` line.
 
@@ -99,7 +99,7 @@ Each job: a `--dry-run` that writes nothing, a test against a fixture home folde
 - **Phase 1, read-only core:** every report-only pick, the report command, one LaunchAgent per cadence (hourly, every 6 h, daily, weekly, monthly, drive mount), not one per job.
 - **Phase 2, jobs that move things:** skip entirely if none were picked. Before starting, repeat the warning in two lines and re-check the backup date; continue only on a fresh "yes". Build the Trash + manifest + `restore` machinery first, with a real Trash-and-restore round trip on a scratch file; then the picked jobs. Before each job's first real (non-dry) run, show its dry-run list (every path it would touch) and get a yes; never let a file-touching job's first real run be a scheduled one the user hasn't seen. Ask-first jobs write proposals and act only via `<name> apply <id>`; a new proposal posts one macOS notification.
 - **Phase 3, local AI and search:** only the picked items, only local models.
-- **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen. The menu-bar icon must stay still (rule 13); before calling this phase done, run the required green/yellow/red check in menu-bar-app.md and show the CPU and memory numbers.
+- **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all twelve / pick some / just Native and Pro) and build the command center screen. The menu-bar icon must stay still (rule 13); before calling this phase done, run the required green/yellow/red check in menu-bar-app.md and show the CPU and memory numbers.
 
 Before calling any phase done, also run every cadence as a dry run (`<name> cadence hourly --dry-run`, and 6h, daily, weekly, monthly) and confirm no job crashes and no red appears that isn't a real problem on this Mac; explain every yellow.
 
@@ -404,7 +404,7 @@ Any change in the window's size moves its top edge away from the menu bar, so th
 
 # Theme menu (for the menu-bar app)
 
-Offer these during phase 4. The user can pick one, several, or all; build each as a **whole look**, not a color swap. Every theme sets: typeface style, palette, backdrop, card surface, the main gauge, the chart style, icon style, meters, and motion. Write each theme as data (a theme spec with every token), so adding one never touches the views.
+Offer these during phase 4. **Pro** is the default suggestion for anyone who wants a no-nonsense work tool rather than a show piece. The user can pick one, several, or all; build each as a **whole look**, not a color swap. Every theme sets: typeface style, palette, backdrop, card surface, the main gauge, the chart style, icon style, meters, and motion. Write each theme as data (a theme spec with every token), so adding one never touches the views.
 
 Use only fonts that ship with macOS (pick one matching the style named below), or the system font.
 
@@ -421,6 +421,7 @@ Use only fonts that ship with macOS (pick one matching the style named below), o
 | **Blueprint** | Drafting table | Condensed technical sans, uppercase, wide tracking | Cyanotype blue with a drafting grid; dashed outlines | Protractor | Isometric ribbon chart | Precise, ruled |
 | **Sorbet** | Loud and happy | Rounded bold | Pastel confetti; chunky outlined cards; sticker icons | Fat donut | Candy bars that bounce in | Springy |
 | **Abyss** | Deep ocean | Light humanist sans, uppercase, wide tracking | Dark teal depths with rising bioluminescent particles | Sonar sweep showing free space | Light particles flowing along the line | Slow drift |
+| **Pro** | A professional admin console: dense, calm, businesslike; follows light and dark mode | System font, small and compact, tabular numbers | Flat off-white page with white cards (dark: graphite page, charcoal cards), hairline borders, no shadows or glow, one saturated blue accent | Thin ring with the number in the middle | Thin line with a faint area fill and light gridlines | None: quick fades only |
 
 ## Rules every theme must follow
 - **Readable:** status text and numbers meet WCAG AA contrast in every theme; status is never shown by color alone (an icon or word too).
@@ -490,7 +491,7 @@ This project's specifics:
 
 {
   "name": "Kempt",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "released": "2026-11-02",
   "home": "https://github.com/kempt-kit/kempt",
   "page": "https://kempt-kit.github.io/kempt/",
@@ -504,6 +505,12 @@ This project's specifics:
 # Changelog
 
 Newest first. Each release says what changed in the kit and, under **For tools built from an earlier version**, what an AI agent should offer to add or change in an existing tool. Every item there is opt-in and goes through the same warnings and gates as a new build.
+
+## 1.5.0 — 2026-11-02
+- **New theme: Pro.** A dense, businesslike admin-console look: flat white or graphite cards, hairline borders, one blue accent, thin rings and sparklines, no motion. Follows light and dark mode. Suggested first for anyone who wants a work tool rather than a show piece. (Requested by a friend who built their own.)
+
+**For tools built from an earlier version:**
+1. Optional: add the Pro theme from `reference/themes.md` (a new theme spec plus any new gauge/chart styles it needs). Touches: the app's theme catalog and views only; run the green/yellow/red check afterwards.
 
 ## 1.4.0 — 2026-11-02 — reliability audit
 A full audit of the original app this recipe comes from found the problems below; the recipe now tells your AI to build it right the first time.
