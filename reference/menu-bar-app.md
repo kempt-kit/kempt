@@ -25,6 +25,26 @@ A thin native front end over the tool. It never re-implements a check or touches
 - "Open at Login" via `SMAppService` is persistence: the user turns it on.
 - Changing the bundle id resets the login item and saved preferences.
 
+## Window stability (the menu window is anchored at its bottom edge)
+Any change in the window's size moves its top edge away from the menu bar, so the menu appears to jump:
+- **One fixed size for every screen and tab.** Size it to the tallest content the menu shows (measure each tab's natural height and remember the largest), not to the screen; a screen-height guess leaves a huge empty window on tall monitors. Narrower screens (confirm, settings, search results) center their content inside the same size.
+- **Clamp to the smallest screen** (`NSScreen.screens`), not `NSScreen.main`, which is whichever screen has the focused window: a laptop plus an external display otherwise gives a menu taller than the laptop screen.
+- **Status lines that come and go** (a progress bar, a notice) live in a fixed-height slot or an overlay, never above the content where they push it.
+- **Anything that can grow** (a list of proposals, a long dry-run output, a settings grid) scrolls inside its area, with the action buttons pinned outside the scroll so "Approve" can never be pushed off screen.
+- The settings window is resizable and fits a 13-inch screen (about 800 points of usable height).
+
+## Motion and performance
+- Animations run only while their window is visible and Reduce Motion is off. That includes separate windows (a job detail window left open behind others must stop animating), not just the menu.
+- Never change observed state while a view is being drawn (assigning a shared theme, publishing from a visibility probe); defer it (`DispatchQueue.main.async`). Today's loop and tomorrow's stutter both start there.
+- Read files, parse settings and look up file icons once per refresh in the model, never inside view bodies (they redraw every few seconds; an icon for a path on a sleeping external drive stalls the menu).
+- Guard every gauge and meter fraction with `isFinite` and clamp thresholds above zero on load: a 0/0 becomes NaN, and converting NaN to an integer crashes the app.
+
+## Actions
+- Every action that changes something (approve, quit, force quit) needs a real second confirmation. A confirm button that appears under the cursor turns a double-click into a yes: keep it disabled for about 0.8 s after it appears.
+- A "run one check" menu runs jobs that move files only as a dry run (say so in the menu), or routes them to the confirm screen.
+- One command at a time, everywhere: a job window's dry-run goes through the same lock as the menu's buttons.
+- Pass user text to commands after `--` (a search for "-v" must stay a search).
+
 ## Guardrails
 - Near 0% CPU when closed: animate only inside the opened menu or windows (pause `TimelineView` when hidden), never in the menu-bar label, and no polling faster than the file watcher needs.
 - **Required check before the app counts as done:** launch the real installed app once in each status (green, yellow and red, using fixture results or a `--status` test switch), leave the menu closed for 60 seconds each time, and confirm CPU stays near 0% and memory stays flat (`ps -o %cpu=,rss= -p <pid>` every few seconds). Report the numbers. A red-only failure is the most likely kind.

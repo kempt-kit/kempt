@@ -2,6 +2,21 @@
 
 Newest first. Each release says what changed in the kit and, under **For tools built from an earlier version**, what an AI agent should offer to add or change in an existing tool. Every item there is opt-in and goes through the same warnings and gates as a new build.
 
+## 1.4.0 — 2026-11-02 — reliability audit
+A full audit of the original app this recipe comes from found the problems below; the recipe now tells your AI to build it right the first time.
+- **Scheduler:** every job isolated (one crash never stops the rest), the space sentinel runs first, missed runs (Mac off at the scheduled time) are caught up, a cadence never overlaps itself, and command time limits really stop runaway helpers.
+- **No false alarms, no false all-clears:** new safety rule 14. Unreadable is "unknown", not green; normal setups (Apple-signed or Homebrew tools, script wrappers) are yellow, not red; new background items stay flagged until acknowledged.
+- **Safer file handling:** every move gets the in-use check, drive copies use a verified `.partial` file, and OCR temp files are always cleaned up.
+- **Privacy:** new safety rule 15. Codes and passwords are dropped from screenshot and scan text.
+- **Menu-bar app:** one fixed window size (no jumping between tabs or screens), sizes from content, clamps to the smallest screen, scrolls instead of clipping, delayed confirm buttons, dry-run-only quick runs, no work inside view drawing, and NaN guards.
+
+**For tools built from an earlier version** (each is opt-in; 1 and 2 matter most):
+1. Scheduler: isolate each job, run the sentinel first, add missed-run catch-up and a per-cadence lock, and kill commands by process group on timeout (architecture.md, "Running jobs reliably"). Touches: the entry script and the shared command runner.
+2. Add rules 14 and 15 to the tool's AGENTS.md, then fix any check that shows green when it couldn't read something, or red for an ordinary setup; make new background items stay flagged until acknowledged; drop codes and passwords from stored OCR text. Touches: the checks involved and the OCR/screenshot job.
+3. File handling: add the in-use check to every move, `.partial` drive copies, OCR temp cleanup, keep un-approved items waiting (architecture.md, "Files the tool moves").
+4. Menu-bar app: apply "Window stability", "Motion and performance" and "Actions" in menu-bar-app.md, then rerun the green/yellow/red check.
+5. Log trimming, and an installer that writes agent paths from the repo's current location.
+
 ## 1.3.2 — 2026-11-02 — URGENT fix for menu-bar apps
 - **Bug fixed in the recipe:** 1.3.0 and 1.3.1 said the menu-bar icon could pulse while something is red. On macOS 27 an animated menu-bar icon can loop forever: the app spins at 100% CPU, its memory grows by gigabytes a minute (one build reached 17 GB and pushed 20 GB into swap), and the menu never opens. It only happens while a check is red, so it's easy to miss.
 - The recipe now forbids any animation in the menu-bar icon (new safety rule 13) and requires a green/yellow/red test with CPU and memory numbers before the menu-bar app counts as done.

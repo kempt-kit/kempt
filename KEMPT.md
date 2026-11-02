@@ -1,4 +1,4 @@
-# KEMPT.md — Kempt 1.3.2, in one file
+# KEMPT.md — Kempt 1.4.0, in one file
 
 This file is the whole Kempt. Each original file follows below its own `===== FILE: <path> =====` line.
 
@@ -101,6 +101,8 @@ Each job: a `--dry-run` that writes nothing, a test against a fixture home folde
 - **Phase 3, local AI and search:** only the picked items, only local models.
 - **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen. The menu-bar icon must stay still (rule 13); before calling this phase done, run the required green/yellow/red check in menu-bar-app.md and show the CPU and memory numbers.
 
+Before calling any phase done, also run every cadence as a dry run (`<name> cadence hourly --dry-run`, and 6h, daily, weekly, monthly) and confirm no job crashes and no red appears that isn't a real problem on this Mac; explain every yellow.
+
 After each phase, review your own diff as a skeptic (use a separate reviewer agent if your tool supports one) for anything that could delete, overwrite, leak secrets or hang; fix what you find; re-run the tests.
 
 ## 6. Hand over
@@ -164,6 +166,8 @@ Each rule exists because automated cleanup, scripts or careless automation can c
 11. **No "free memory" buttons.** macOS manages memory itself, and forcing it to purge rarely helps. Show memory pressure and name a leaking process instead.
 12. **Never change system security settings** (firewall, FileVault, SIP, Gatekeeper, sharing). Report them and deep-link the user to the right System Settings pane.
 13. **The menu-bar icon never animates.** No animation, `TimelineView`, symbol effect or timer-driven image in the menu-bar label; it can loop forever and consume all memory. Before calling the menu-bar app done, run it in a red state for 60 seconds and confirm CPU near 0% and flat memory.
+14. **Unknown is never green, and normal is never red.** If a check can't read something (no Full Disk Access, a timeout, a second Mac asleep), report it as yellow "unknown" with why, never as an all-clear. And don't alarm on expected states: new background items signed by Apple or an identified developer, Homebrew's ad-hoc signed tools and script wrappers are yellow with a plain reason; only an unsigned or unrecognised compiled program is red. Treat "the setting is not set" (macOS reports "does not exist") as off, and only a refused read as unknown. A new background item stays flagged until the user acknowledges it, instead of clearing itself on the next run.
+15. **Screenshots and scans hold secrets.** Before keeping, indexing or writing out any OCR text, drop lines that look like one-time codes, passwords or PINs. Keep extracted notes out of cloud-synced folders unless the user chooses otherwise.
 
 ===== FILE: reference/ideas.md =====
 
@@ -319,6 +323,22 @@ Count your agents (a login item also appears in `launchctl list` as `application
 launchctl list | grep -cE 'com\.<you>\.<name>\.(hourly|6h|daily|weekly|monthly|mount)$'
 ```
 
+## Running jobs reliably
+- **Isolate every job completely.** Import, run and save each job inside its own error handling, so one broken or crashing job is recorded as "job crashed" and the rest of its cadence still runs. A malformed settings file or a full disk must not silence the space alarm.
+- **Run the space sentinel first** in its hour; slow jobs (OCR, local AI) go after it.
+- **Catch up missed runs.** launchd skips a calendar run missed while the Mac was off or restarting, so a Mac that's off at 05:30 silently loses that day. Record when each cadence last finished; each hourly run starts any daily (over 26 h), weekly (over 8 days) or monthly (over 32 days) run that's overdue.
+- **Never overlap a cadence with itself:** take a non-blocking lock file per cadence and skip if it's held.
+- **Time limits that really stop things:** run each command in its own process group, and on timeout kill the whole group (helpers a command starts can outlive a simple alarm and hang the run).
+- **Keep files bounded:** trim the tool's own logs (for example, over 2 MB keep the newest 1 MB) and drop old closed proposals. Never trim the Trash manifest; restore needs every line.
+- **Install agents from wherever the repo is:** the install script writes the plists with the repo's current path and the user's home, so moving the folder needs only a re-run of the installer.
+
+## Files the tool moves
+- Every move (not just Trash moves) re-checks the protected-folder guard and skips anything open or changed in the last 10 minutes.
+- Record every move in the manifest, even when Finder doesn't report where it put the item.
+- Copies to a drive go to `<name>.partial`, are verified by re-reading them, and only then renamed and the original trashed; any failure removes the partial copy, so retries aren't blocked.
+- Rewrites (OCR) check that the file is quiet before starting, and remove their temporary file on any failure.
+- Approving only some items of a proposal leaves the rest waiting in a new proposal, never silently marked done.
+
 ## LaunchAgents
 One plist per cadence (`StartInterval` 3600 for hourly, `StartCalendarInterval` for daily/weekly/monthly, `StartOnMount` for the drive job), running `/usr/bin/python3 <repo>/bin/<name> cadence <c>` with stdout/stderr to the logs folder. `StartOnMount` fires for any volume, so the mount job itself checks `/Volumes/<drive name>` exists and exits quietly otherwise. A calendar run missed while the Mac sleeps runs once on wake; one missed while it is powered off is skipped. So jobs must not assume they ran yesterday: diff against the newest snapshot, whatever its age. Renaming or moving the repo breaks the plist paths, so ship a script that swaps old agents for new ones.
 
@@ -353,6 +373,26 @@ A thin native front end over the tool. It never re-implements a check or touches
 - Screenshot tools often can't capture menu-bar-only windows; render views offscreen to PNG for checks.
 - "Open at Login" via `SMAppService` is persistence: the user turns it on.
 - Changing the bundle id resets the login item and saved preferences.
+
+## Window stability (the menu window is anchored at its bottom edge)
+Any change in the window's size moves its top edge away from the menu bar, so the menu appears to jump:
+- **One fixed size for every screen and tab.** Size it to the tallest content the menu shows (measure each tab's natural height and remember the largest), not to the screen; a screen-height guess leaves a huge empty window on tall monitors. Narrower screens (confirm, settings, search results) center their content inside the same size.
+- **Clamp to the smallest screen** (`NSScreen.screens`), not `NSScreen.main`, which is whichever screen has the focused window: a laptop plus an external display otherwise gives a menu taller than the laptop screen.
+- **Status lines that come and go** (a progress bar, a notice) live in a fixed-height slot or an overlay, never above the content where they push it.
+- **Anything that can grow** (a list of proposals, a long dry-run output, a settings grid) scrolls inside its area, with the action buttons pinned outside the scroll so "Approve" can never be pushed off screen.
+- The settings window is resizable and fits a 13-inch screen (about 800 points of usable height).
+
+## Motion and performance
+- Animations run only while their window is visible and Reduce Motion is off. That includes separate windows (a job detail window left open behind others must stop animating), not just the menu.
+- Never change observed state while a view is being drawn (assigning a shared theme, publishing from a visibility probe); defer it (`DispatchQueue.main.async`). Today's loop and tomorrow's stutter both start there.
+- Read files, parse settings and look up file icons once per refresh in the model, never inside view bodies (they redraw every few seconds; an icon for a path on a sleeping external drive stalls the menu).
+- Guard every gauge and meter fraction with `isFinite` and clamp thresholds above zero on load: a 0/0 becomes NaN, and converting NaN to an integer crashes the app.
+
+## Actions
+- Every action that changes something (approve, quit, force quit) needs a real second confirmation. A confirm button that appears under the cursor turns a double-click into a yes: keep it disabled for about 0.8 s after it appears.
+- A "run one check" menu runs jobs that move files only as a dry run (say so in the menu), or routes them to the confirm screen.
+- One command at a time, everywhere: a job window's dry-run goes through the same lock as the menu's buttons.
+- Pass user text to commands after `--` (a search for "-v" must stay a search).
 
 ## Guardrails
 - Near 0% CPU when closed: animate only inside the opened menu or windows (pause `TimelineView` when hidden), never in the menu-bar label, and no polling faster than the file watcher needs.
@@ -450,7 +490,7 @@ This project's specifics:
 
 {
   "name": "Kempt",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "released": "2026-11-02",
   "home": "https://github.com/kempt-kit/kempt",
   "page": "https://kempt-kit.github.io/kempt/",
@@ -464,6 +504,21 @@ This project's specifics:
 # Changelog
 
 Newest first. Each release says what changed in the kit and, under **For tools built from an earlier version**, what an AI agent should offer to add or change in an existing tool. Every item there is opt-in and goes through the same warnings and gates as a new build.
+
+## 1.4.0 — 2026-11-02 — reliability audit
+A full audit of the original app this recipe comes from found the problems below; the recipe now tells your AI to build it right the first time.
+- **Scheduler:** every job isolated (one crash never stops the rest), the space sentinel runs first, missed runs (Mac off at the scheduled time) are caught up, a cadence never overlaps itself, and command time limits really stop runaway helpers.
+- **No false alarms, no false all-clears:** new safety rule 14. Unreadable is "unknown", not green; normal setups (Apple-signed or Homebrew tools, script wrappers) are yellow, not red; new background items stay flagged until acknowledged.
+- **Safer file handling:** every move gets the in-use check, drive copies use a verified `.partial` file, and OCR temp files are always cleaned up.
+- **Privacy:** new safety rule 15. Codes and passwords are dropped from screenshot and scan text.
+- **Menu-bar app:** one fixed window size (no jumping between tabs or screens), sizes from content, clamps to the smallest screen, scrolls instead of clipping, delayed confirm buttons, dry-run-only quick runs, no work inside view drawing, and NaN guards.
+
+**For tools built from an earlier version** (each is opt-in; 1 and 2 matter most):
+1. Scheduler: isolate each job, run the sentinel first, add missed-run catch-up and a per-cadence lock, and kill commands by process group on timeout (architecture.md, "Running jobs reliably"). Touches: the entry script and the shared command runner.
+2. Add rules 14 and 15 to the tool's AGENTS.md, then fix any check that shows green when it couldn't read something, or red for an ordinary setup; make new background items stay flagged until acknowledged; drop codes and passwords from stored OCR text. Touches: the checks involved and the OCR/screenshot job.
+3. File handling: add the in-use check to every move, `.partial` drive copies, OCR temp cleanup, keep un-approved items waiting (architecture.md, "Files the tool moves").
+4. Menu-bar app: apply "Window stability", "Motion and performance" and "Actions" in menu-bar-app.md, then rerun the green/yellow/red check.
+5. Log trimming, and an installer that writes agent paths from the repo's current location.
 
 ## 1.3.2 — 2026-11-02 — URGENT fix for menu-bar apps
 - **Bug fixed in the recipe:** 1.3.0 and 1.3.1 said the menu-bar icon could pulse while something is red. On macOS 27 an animated menu-bar icon can loop forever: the app spins at 100% CPU, its memory grows by gigabytes a minute (one build reached 17 GB and pushed 20 GB into swap), and the menu never opens. It only happens while a check is red, so it's easy to miss.

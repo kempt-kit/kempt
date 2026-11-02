@@ -71,6 +71,8 @@ Each job: a `--dry-run` that writes nothing, a test against a fixture home folde
 - **Phase 3, local AI and search:** only the picked items, only local models.
 - **Phase 4, menu-bar app (optional):** see menu-bar-app.md. Offer the theme menu in themes.md (multiple choice: all eleven / pick some / just Native) and build the command center screen. The menu-bar icon must stay still (rule 13); before calling this phase done, run the required green/yellow/red check in menu-bar-app.md and show the CPU and memory numbers.
 
+Before calling any phase done, also run every cadence as a dry run (`<name> cadence hourly --dry-run`, and 6h, daily, weekly, monthly) and confirm no job crashes and no red appears that isn't a real problem on this Mac; explain every yellow.
+
 After each phase, review your own diff as a skeptic (use a separate reviewer agent if your tool supports one) for anything that could delete, overwrite, leak secrets or hang; fix what you find; re-run the tests.
 
 ## 6. Hand over
